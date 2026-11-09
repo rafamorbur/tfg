@@ -34,5 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    // Key de acceso para la api de AEMET
+
+   'aemet' => [
+    'key' => env('AEMET_API_KEY'),
+],
 
 ];
