@@ -213,7 +213,6 @@ for (let muelle of muelles) {
                             //de todos los amarres que tiene un pantalan
                             let total = amarresDelPantalan.length;
                             //nos quedamos solo con los disponibles
-                            // CAMBIO AQUÍ: Usamos estado_visual
                             let libres = amarresDelPantalan.filter(
                                 (a) => a.estado_visual === "disponible",
                             ).length;
@@ -297,7 +296,6 @@ for (let muelle of muelles) {
                                         "bg-amber-500 opacity-50 cursor-not-allowed";
                                 }
                                 //acumulamos la información de cada amarre
-                                // CAMBIO AQUÍ: Usamos estado_visual en el title
                                 amarresHTML += `
                                 <div id="amarre-${amarre.id_amarre}" 
                                     data-id="${amarre.id_amarre}" 
@@ -317,14 +315,49 @@ for (let muelle of muelles) {
                         amarresHTML = `<p class="text-xs text-slate-400 italic">No hay amarres dados de alta en este muelle.</p>`;
                     }
 
+                    //por cada muelle decidimos mostrar los servicios
+                    //Creamos el HTML para los servicios usando un bucle for ---
+                    let serviciosHTML = "";
+                    if (datos.servicios && datos.servicios.length > 0) {
+                        for (let servicio of datos.servicios) {
+                            serviciosHTML += `<span class="bg-teal-50 text-teal-700 text-[10px] px-2.5 py-1 rounded-md font-bold border border-teal-200 inline-block mr-1 mb-1 shadow-sm">${servicio.nombre}</span>`;
+                        }
+                    } else {
+                        serviciosHTML = `<span class="text-xs text-slate-400 italic">No hay servicios registrados.</span>`;
+                    }
+
                     //finalmente pintamos la información acumulada de cada amarre
                     panel.innerHTML = `
                         <div class="animate-fade-in">
                             <h2 class="text-2xl font-bold text-slate-800 mb-1">${datos.nombre}</h2>
                             <p class="text-sm text-slate-500 mb-4 flex items-center gap-1">
-                                📍 ${datos.localidad} (${datos.provincia})
+                                ${datos.localidad} (${datos.provincia})
                             </p>
-                            
+
+                            <!--pintamos la información de contacto y servicios -->
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 space-y-3 shadow-sm">
+                                <div class="flex items-start gap-2 text-sm text-slate-600">
+                                    <svg class="w-4 h-4 text-teal-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    <span>${datos.direccion || "Dirección no disponible"}</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm text-slate-600">
+                                    <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                    <span>${datos.telefono || "No disponible"}</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm text-slate-600">
+                                    <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                    <a href="mailto:${datos.email}" class="hover:text-teal-700 hover:underline">${datos.email || "No disponible"}</a>
+                                </div>
+                                
+                                <div class="border-t border-slate-200 pt-3 mt-3">
+                                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Servicios del muelle</p>
+                                    <div>
+                                        ${serviciosHTML}
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- FIN DEL NUEVO BLOQUE -->
+
                             <div class="mb-6">
                                 <h3 class="font-semibold text-slate-700 mb-3 text-sm">Plano de pantalanes</h3>
                                 <div class="overflow-y-auto max-h-96 pr-1 space-y-2">
@@ -358,7 +391,7 @@ for (let muelle of muelles) {
                         divAmarre.addEventListener("click", function () {
                             // Solo dejamos seleccionar si el amarre está disponible (verde)
                             if (this.classList.contains("bg-emerald-500")) {
-                                // 1. Quitamos la selección de cualquier otro amarre
+                                // Quitamos la selección de cualquier otro amarre
                                 let todosLosAmarres = document.querySelectorAll(
                                     ".amarre-seleccionable",
                                 );
@@ -371,7 +404,7 @@ for (let muelle of muelles) {
                                     );
                                 }
 
-                                // 2. Marcamos este amarre visualmente
+                                // Marcamos este amarre visualmente
                                 this.classList.add(
                                     "ring-4",
                                     "ring-white",
@@ -379,11 +412,11 @@ for (let muelle of muelles) {
                                     "scale-110",
                                 );
 
-                                // 3. Guardamos el ID del amarre en una variable global
+                                // Guardamos el ID del amarre en una variable global
                                 window.amarreSeleccionadoId =
                                     this.getAttribute("data-id");
 
-                                // 4. Cambiamos el texto del botón para que quede claro
+                                // Cambiamos el texto del botón para que quede claro
                                 let btnReserva = document.querySelector(
                                     "#panel-detalles button",
                                 );
@@ -398,7 +431,7 @@ for (let muelle of muelles) {
                                     "animate-pulse",
                                 );
 
-                                // 5. Ocultamos el mensaje de error si estaba visible
+                                // Ocultamos el mensaje de error si estaba visible
                                 document
                                     .getElementById("mensaje-error-reserva")
                                     .classList.add("hidden");
@@ -437,7 +470,7 @@ for (let muelle of muelles) {
                     console.error("Error:", error);
                     panel.innerHTML = `
                         <div class="text-center text-red-500 mt-20">
-                            <p class="font-semibold">⚠️ No se pudo cargar el muelle</p>
+                            <p class="font-semibold"> No se pudo cargar el muelle</p>
                             <p class="text-xs text-slate-400 mt-1">Comprueba la conexión con el servidor.</p>
                         </div>
                     `;
@@ -473,12 +506,15 @@ function filtrarBusqueda() {
     if (fechaSalida && new Date(fechaSalida) < hoy) {
         errores.push("La fecha de salida no puede ser anterior a hoy.");
     }
+    // CAMBIO AQUÍ: Usamos < en lugar de <= para permitir reservas del mismo día
     if (
         fechaEntrada &&
         fechaSalida &&
-        new Date(fechaSalida) <= new Date(fechaEntrada)
+        new Date(fechaSalida) < new Date(fechaEntrada)
     ) {
-        errores.push("La fecha de salida debe ser posterior a la de entrada.");
+        errores.push(
+            "La fecha de salida no puede ser anterior a la de entrada.",
+        );
     }
     if (eslora < 0 || manga < 0 || calado < 0) {
         errores.push("Las dimensiones no pueden ser negativas.");
@@ -501,35 +537,42 @@ function filtrarBusqueda() {
 
 // Función para enviar los datos a Laravel
 function aplicarFiltrosBackend(
+    //la función recibe los valores que el usuario le ha pasado por el filtro
     fechaEntrada,
     fechaSalida,
     eslora,
     manga,
     calado,
 ) {
-    // Mostramos estado de carga en el texto
+    //buscamos el div con el id texto-amarres y le pasamos un texto inicial
     let textoResultados = document.getElementById("texto-resultados");
     textoResultados.innerHTML = "Buscando amarres...";
 
-    // Hacemos la petición fetch
+    //regalizmaos una petición asíncrona al servidor
     fetch(
-        //los datos escritos por el usuario van en la url
+        //llamamos a la ruta de laravel y le pasamos los parámetros por la url
         `/api/filtrar-amarres?fecha_entrada=${fechaEntrada}&fecha_salida=${fechaSalida}&eslora=${eslora}&manga=${manga}&calado=${calado}`,
     )
-        //Las respuestas (promesas) del servidor
-        .then((res) => res.json())
+        //procemos la respuseta y nos devuelve una promesa
+        .then((res) => {
+            // si la rsepuseta es errónea lanzamos un error
+            if (!res.ok) throw new Error("Error en el servidor");
+            return res.json();
+        })
+        // si es exitosa convertimso la respuseta de laravel en un objeto js
         .then((data) => {
-            // {  "total_muelles_compatibles": 3,"muelles_compatibles": [1, 3, 5]}
-            //pintamos el texto con los datos que hemos recibido
+            //pintamos los resultados en el mapa
             textoResultados.innerHTML = `${data.total_muelles_compatibles} de ${muelles.length} muelles con amarres compatibles`;
 
-            // Recorremos todos puertos del mapa
+            //recorremos cada muelle
             for (let muelle of muelles) {
-                //buscamos si el pin esta dentro del total de muelles compatibles
+                //buscamos el pin de ese muelle en el diccionario marcadoresMueles
                 let pin = marcadoresMuelles[muelle.id_muelle];
+                //si existe comprobamos si
                 if (pin) {
-                    //si esta incluido opacidad al maximo
+                    //si el pin está dentro de la lista que nos devuelve laravel
                     if (data.muelles_compatibles.includes(muelle.id_muelle)) {
+                        //lo hacemos visible 100%
                         pin.setOpacity(1);
                         pin.setZIndexOffset(1000);
                     } else {
@@ -602,40 +645,37 @@ function pintarPanelParking() {
 
         //si tiene amarres nos quedamos solo que estén disponibles
         if (totalAmarres > 0) {
-            // CAMBIO AQUÍ: Usamos estado_visual
             amarresLibres = muelle.amarres.filter(
                 (a) => a.estado_visual === "disponible",
             ).length;
         }
 
         // Calculamos el porcentaje de ocupación para la barra
-        let porcentajeOcupacion =
-            totalAmarres > 0
-                ? ((totalAmarres - amarresLibres) / totalAmarres) * 100
-                : 100; //si no tiene amarres libre consideramos que el 100% están ocupados
-
-        // Determinamos el color de la barra según la ocupación
-        let colorBarra = "bg-emerald-500"; // Verde por defecto
-        if (porcentajeOcupacion > 50) colorBarra = "bg-amber-500"; // Amarillo si está medio lleno
-        if (porcentajeOcupacion > 85) colorBarra = "bg-red-500"; // Rojo si está casi lleno
+        // Porcentajes para la barra: verde = libres, rojo = ocupados + mantenimiento
+        let porcentajeLibre =
+            //si el muelle tiene amarres libres se divide por el total y se multiplica por 100
+            totalAmarres > 0 ? (amarresLibres / totalAmarres) * 100 : 0;
+        //la diferencia nos da el prcenajte de ocupados
+        let porcentajeOcupado = 100 - porcentajeLibre;
 
         // Generamos el HTML de cada fila del parking
-
+        //
         html += `
             <div class="tarjeta-muelle bg-slate-50 border border-slate-200 rounded-xl p-4 cursor-pointer hover:border-teal-500 transition" data-id="${muelle.id_muelle}">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-bold text-slate-800 text-sm">${muelle.nombre}</h3>
                     <span class="text-xs font-semibold text-slate-600">${amarresLibres} / ${totalAmarres} libres</span>
                 </div>
-                
-                <!-- Barra de progreso tipo parking -->
-                <div class="w-full bg-slate-200 rounded-full h-2.5">
-                    <div class="${colorBarra} h-2.5 rounded-full" style="width: ${porcentajeOcupacion}%"></div>
+
+                <!-- creamos 2 barras, una verde y otra roja, una al lado de la otra -->
+                <div class="w-full bg-slate-200 rounded-full h-2.5 flex overflow-hidden">
+                    <div class="bg-emerald-500 h-full" style="width: ${porcentajeLibre}%"></div>
+                    <div class="bg-red-500 h-full" style="width: ${porcentajeOcupado}%"></div>
                 </div>
-                
+
                 <div class="flex justify-between items-center mt-2">
                     <span class="text-[10px] text-slate-500 uppercase tracking-wider">${muelle.localidad}</span>
-                    <span class="text-[10px] text-slate-500 uppercase tracking-wider">${porcentajeOcupacion.toFixed(0)}% Ocupado</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-wider">${porcentajeOcupado.toFixed(0)}% Ocupado</span>
                 </div>
             </div>
         `;
@@ -658,7 +698,6 @@ function pintarPanelParking() {
 // Función para cuando se hace clic en una tarjeta del panel tipo parking
 function seleccionarMuelleDesdePanel(idMuelle) {
     // Buscamos el muelle en el array global
-    // Buscamos el muelle en el array global (asegurando comparar números)
     let muelleSeleccionado = muelles.find((m) => m.id_muelle === idMuelle);
 
     if (muelleSeleccionado) {

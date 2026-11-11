@@ -85,4 +85,7 @@ Route::get('/politica-reembolsos', [App\Http\Controllers\LegalController::class,
 Route::get('/contacto', [App\Http\Controllers\ContactoController::class, 'index'])->name('contacto.index');
 Route::post('/contacto', [App\Http\Controllers\ContactoController::class, 'store'])->name('contacto.store');
 
+// Ruta de la api para filtrar amarres según dimensiones y fechas
+Route::get('/api/filtrar-amarres', [PrincipalController::class, 'filtrarAmarres']);
+
 require __DIR__ . '/auth.php';
